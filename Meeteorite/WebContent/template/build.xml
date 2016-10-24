@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project basedir="." default="compile" name="Shift">
+
+	<!-- ================= -->
+	<!-- Change Log
+	0_1 Basic resteasy layout
+	0_2 Complete StartIdeas, Hindsight, Insight and Foresight
+	0_3 User interface screens for Shift
+	0_5 Remove . from email
+	0_8 Configure for test builds
+	0_9 Remove duplication of assets folder
+	0_10 Minor layout fixes
+	0_11 Layout changes and ajax
+	0_12 Return NONE from redirect to prevent occasional IllegalStateException, re-enable logging
+	0_13 Reenable logging in action filter
+	0_14 Minor changes
+	0_15 Multiple changes for AMP
+	0_16 Minor layout changes
+	0_17 Add Dart meeting to banner
+	0_18 Add parked thoughts to Dart Meetings
+	0_19 Minor layout
+	0_20 Disallow adding same email address
+	0_21 Migration of DART features to SHIFT
+	0_22 Multiple fixes
+	0_23 Add setting password
+	update dartitem  set status = 0 where status = 1;
+	update traction set status = 0 where status = 1;
+	update person set guest = false;
+	0_24 Revise branding
+	0_25 Only move meeting from draft if invitations have been sent, revise current logos, 
+		preferences button to go back to dashboard, float clock, PDF report
+		first draft of meeteorite dashboard
+		update meeting set invitationsend = true
+	0_26 Multiple enhancements.  Consolidation of Meeteorite pages.
+	0_27 Database upgrade
+	0_28 Add system activity
+	0_29 Add expanding text areas
+		alter table event alter column name type varchar(25);
+	0_30 Multiple changes and fix of random generator for Linux
+	0_31 January development
+	0_32 Add rollover to clock
+	0_33 Take off *, trim spaces from email address, slighly better email error messages, 
+	0_34 Fix messed up form tag on page
+	0_35 Minor changes
+	0_36 Footer for report
+	0_37 Adjust down tab size and fix quirk for IE
+	0_38 Item owner All
+	alter table agendaitem drop constraint fk...
+	alter table agendaitem alter itemowner_id drop not null;
+	Reminders email
+	update person set reminderperioddays = 1;
+	0_39  Fix error with continue
+	0_40 Display sub items on Agenda Review
+	Parked thoughts on agenda review and summary close
+	0_41 Visual changes for AMP. Increase logging.
+	0_42 Update terms and conditions and capitalisation of email addresses
+	0_43 Options to get PDF at and of meeting and item ownership to all.
+	update meeting set followupreportsent = complete;
+	Prevent double sending of PDF
+	0_44 Old link and meeting restart
+	
+	-->
+
+	<!-- ================= -->
+	<!-- Define properties -->
+	<!--property file="build.properties"/-->
+	<property name="app.version" value="0_44" />
+	
+	<loadproperties srcFile="src/local.properties"/>
+	<property name="app.name" value="Shift" />
+	<property name="deploy.home" value="${dev.tomcat.home}/webapps/${app.name}" />
+	<property name="src.home" value="src" />
+	<property name="build.home" value="${deploy.home}/WEB-INF/classes" />
+	<property name="test.home" value="${deploy.home}/WEB-INF/test" />
+	<property name="lib.home" value="${deploy.home}/WEB-INF/lib" />
+	<property name="tst.app.name" value="ShiftTest" />
+	<property name="tst.deploy.home" value="${deploy.home}/../${tst.app.name}" />
+	<property name="server.host" value="${dev.server.host}" />
+
+
+	<!-- ======================================================= -->
+	<!-- Define the classpath used for throughout this build file -->
+	<path id="project.classpath">
+		<fileset dir="WebContent/WEB-INF/lib">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+
+	<!-- ===== -->
+	<!-- Clean -->
+	<!-- Delete the build and dist directories -->
+	<target name="clean">
+		<delete dir="${deploy.home}" />
+		<delete dir="${tst.deploy.home}" />
+	</target>
+
+	<!-- ======= -->
+	<!-- Prepare directories and static content -->
+	<!-- Create build directory and copy static content -->
+	<target name="prepare">
+		<mkdir dir="${build.home}" />
+		<mkdir dir="${test.home}" />
+		<copy preservelastmodified="yes" todir="${build.home}">
+			<fileset dir="${src.home}">
+				<include name="**/*.xml" />
+				<include name="**/*.properties" />
+			</fileset>
+		</copy>
+		<copy preservelastmodified="yes" todir="${deploy.home}">
+			<fileset dir="WebContent">
+				<include name="**/*" />
+				<exclude name=".svn" />
+				<exclude name="**/servlet-api.jar" />
+			</fileset>
+		</copy>
+		<echo file="${build.home}/environment.properties">environment=dev</echo>
+		<copy todir="build/classes" file="${build.home}/environment.properties">
+		</copy>
+	</target>
+
+
+	<!-- ======== -->
+	<!-- Compile  -->
+	<!-- Compile Java sources -->
+	<target name="compile" depends="prepare">
+		<javac debug="true" deprecation="true" destdir="${build.home}" includeantruntime="false">
+			<classpath refid="project.classpath" />
+			<src path="${src.home}" />
+		</javac>
+		<javac debug="true" deprecation="true" destdir="${test.home}" includeantruntime="false">
+			<classpath refid="project.classpath" />
+			<classpath>
+				<pathelement location="${build.home}/" />
+			</classpath>
+			<src path="test" />
+		</javac>
+	</target>
+
+	<!-- ======= -->
+	<!-- Full Test -->
+	<target name="test" depends="clean, compile">
+		<copy todir="${build.home}">
+			<fileset dir="${test.home}" />
+		</copy>
+		<java dir="${build.home}" fork="yes" failonerror="true" classname="test.Runner">
+			<classpath refid="project.classpath" />
+			<classpath>
+				<pathelement location="${build.home}/" />
+			</classpath>
+		</java>
+	</target>
+
+	<!-- ======= -->
+	<!-- Build production release -->
+	<!-- Reformat source files -->
+	<target name="productionRelease" depends="clean, compile">
+		<echo file="${build.home}/environment.properties">environment=pro</echo>
+		<delete dir="${lib.home}" />
+		<property name="archive" value="${deploy.home}/../${app.name}_${app.version}.zip" />
+		<zip destfile="${archive}" basedir="${deploy.home}/.." includes="${app.name}/**" />
+		<scp file="${archive}" todir="root@${server.host}:/usr/local/tomcat/webapps" verbose="false" keyfile="Oct-2012-keypair.ssh" passphrase="" trust="true" />
+		<sshexec command="export JAVA_HOME=/usr/local/java;/etc/init.d/tomcat stop;sleep 5s;rm -rf /usr/local/tomcat/work/Catalina/localhost;cd /usr/local/tomcat/webapps;rm -rf ${app.name};unzip ${app.name}_${app.version}.zip;mkdir ${app.name}/WEB-INF/lib;cp /root/files/Shift/* ${app.name}/WEB-INF/lib;/etc/init.d/tomcat start" host="${server.host}" username="root" keyfile="Oct-2012-keypair.ssh" passphrase="" trust="true" />
+	</target>
+
+	<!-- ======= -->
+	<!-- Build test release -->
+	<!-- Reformat source files -->
+	<target name="testRelease" depends="clean, compile">
+		<echo file="${build.home}/environment.properties">environment=tst</echo>
+		<delete dir="${lib.home}" />
+		<property name="tst.app.name" value="ShiftTest" />
+		<copy todir="${deploy.home}/../${tst.app.name}">
+			<fileset dir="${deploy.home}" />
+		</copy>
+
+		<property name="archive" value="${deploy.home}/../${tst.app.name}_${app.version}.zip" />
+		<zip destfile="${archive}" basedir="${deploy.home}/.." includes="${tst.app.name}/**" />
+		<scp file="${archive}" todir="root@${server.host}:/usr/local/tomcat/webapps" verbose="false" keyfile="Oct-2012-keypair.ssh" passphrase="" trust="true" />
+		<sshexec command="export JAVA_HOME=/usr/local/java;/etc/init.d/tomcat stop;sleep 5s;rm -rf /usr/local/tomcat/work/Catalina/localhost;cd /usr/local/tomcat/webapps;rm -rf ${tst.app.name};unzip ${tst.app.name}_${app.version}.zip;mkdir ${tst.app.name}/WEB-INF/lib;cp /root/files/Shift/* ${tst.app.name}/WEB-INF/lib;/etc/init.d/tomcat start" host="${server.host}" username="root" keyfile="Oct-2012-keypair.ssh" passphrase="" trust="true" />
+
+	</target>
+
+	<!-- ======= -->
+	<!-- Copy to and from server logs -->
+	<target name="copyFromServer">
+		<scp file="root@${server.host}:/root/Shift.txt" todir="/Users/petermckeown" verbose="true" keyfile="Oct-2012-keypair.ssh" passphrase="" trust="true" />
+	</target>
+
+	<target name="copyToServer">
+		<scp file="/Users/petermckeown/Documents/workspace/Shift/build/classes/SecTest.class" todir="root@${server.host}:/root" verbose="true" keyfile="Oct-2012-keypair.ssh" passphrase="" trust="true" />
+	</target>
+
+	<target name="archiveSource">
+		<zip destfile="../../../Google Drive/Shift/00 Configuration/Meeteorite_Source_${app.version}.zip" >
+			<fileset dir=".">
+				<include name="**/*" />
+				<exclude name=".*" />
+				<exclude name="*.ssh" />
+				<exclude name="build/**"/>
+				<exclude name="WebContent/WEB-INF/lib/**"/>
+				<exclude name="doc/**"/>
+				<exclude name="test/**"/>
+				<exclude name=".settings/**"/>
+				<exclude name="build.xml"/>
+				<exclude name="**/*.properties"/>
+			</fileset>
+		</zip>
+	</target>
+
+	<target name="ftpPublicWebsite">
+		<ftp action="put" server="${dev.ftp.host}" userid="${dev.ftp.user}" password="${dev.ftp.pass}" 
+			remotedir="web" depends="yes" verbose="yes">
+			<fileset dir="PublicSite">
+				<include name="**/*.*" />
+				<exclude name=".svn" />
+			</fileset>
+		</ftp>
+	</target>
+
+</project>

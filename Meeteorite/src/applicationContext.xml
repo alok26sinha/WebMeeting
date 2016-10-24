@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+	Application context definition for PetClinic on Hibernate.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+		xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+			http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd" 
+		default-autowire="byType">
+
+	<!-- ========================= RESOURCE DEFINITIONS ========================= -->
+
+	<!-- Configurer that replaces ${...} placeholders with values from a properties file -->
+	<!-- (in this case, JDBC-related settings for the dataSource definition below) -->
+	<!--context:property-placeholder location="classpath:jdbc.properties"/-->
+
+	<!-- These are three different implementations of the datasource. They were each
+		 Tested with the MultiThreadedTest to find there best performance.
+		 Unpooled gave 110 operations per second with 5 treads
+		 C3P0 gave a best performance of 3200 operations per second with 20 threads
+		 DBCP was 3970 operastions per sec with 16 threads  -->
+	<!--bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+			p:driverClassName="org.postgresql.Driver" p:url="jdbc:postgresql://localhost/Development" 
+			p:username="postgres"
+			p:password="password"/-->
+	<!--bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="org.postgresql.Driver"/>
+		<property name="jdbcUrl" value="jdbc:postgresql://localhost/Development"/>
+		<property name="user" value="postgres"/>
+		<property name="password" value="password"/>
+		<property name="maxStatements" value="180"/>
+		<property name="maxPoolSize" value="16"/>
+	</bean-->	
+	<!-- 		
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close"
+			p:driverClassName="org.postgresql.Driver" 
+			p:url="jdbc:postgresql://localhost/Development" 
+			p:username="postgres"
+			p:password="password"
+			p:maxActive="8"
+			p:maxIdle="8"
+			p:poolPreparedStatements="true" 
+			/>		
+-->
+	<!-- JNDI DataSource for JEE environments -->
+	<!--
+		<jee:jndi-lookup id="dataSource" jndi-name="java:comp/env/jdbc/petclinic"/>
+	-->
+
+	<!-- Hibernate SessionFactory -->
+	<!-- 
+	<bean id="sessionFactory" class="webapp.RecursiveAnnotationSessionFactoryBean"
+			p:dataSource-ref="dataSource" >
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.current_session_context_class">thread</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">false</prop>
+				<prop key="hibernate.generate_statistics">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+		</property>
+	    <property name="annotatedClassesDirectory" value="model"/>
+	</bean>
+	-->
+
+	<!-- ========================= BUSINESS OBJECT DEFINITIONS ========================= -->
+
+	<!--
+		Activates various annotations to be detected in bean classes:
+		Spring's @Required and @Autowired, as well as JSR 250's @Resource.
+	-->
+	<context:annotation-config/>
+
+	<!--
+		Instruct Spring to perform declarative transaction management
+		automatically on annotated classes.
+		We controle transactions in the 
+	-->
+	<!--tx:annotation-driven proxy-target-class="true"/-->
+
+	<!--
+		Exporter that exposes the Hibernate statistics service via JMX. Autodetects the
+		service MBean, using its bean name as JMX object name.
+	-->
+	<context:mbean-export/>
+	
+	<!-- Spring will look through the Dao and register all beans -->
+	<context:component-scan base-package="dao"/>
+	<context:component-scan base-package="service"/>
+	<context:component-scan base-package="security"/>
+	<context:component-scan base-package="subsystems"/>
+	<context:component-scan base-package="service.rest"/>
+	<context:component-scan base-package="servlet"/>
+	<context:component-scan base-package="application"/>
+<!-- 	<context:component-scan base-package="background" /> -->
+	
+	<!-- Hibernate's JMX statistics service -->
+	<!--bean name="petclinic:type=HibernateStatistics" class="org.hibernate.jmx.StatisticsService" autowire="byName"/-->
+	
+	<!-- Resteasy post-processor -->
+	<bean id="restProviderFactory" class="org.jboss.resteasy.spi.ResteasyProviderFactory"></bean>
+	<bean class="org.jboss.resteasy.plugins.spring.SpringBeanProcessor">
+		<property name="providerFactory" ref="restProviderFactory"/>
+		<property name="registry">
+			<bean class="org.jboss.resteasy.core.ResourceMethodRegistry">
+				<constructor-arg><ref bean="restProviderFactory"/></constructor-arg>
+			</bean>
+		</property>
+	</bean>
+
+</beans>

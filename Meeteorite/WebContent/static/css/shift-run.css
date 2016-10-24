@@ -1,0 +1,56 @@
+
+.table-striped2 tbody tr:nth-child(odd) td,
+.table-striped2 tbody tr:nth-child(odd) th {
+  background-color: #f9f9f9;
+}
+
+/* table.table-bordered2, */
+.table-bordered2>tbody>tr {
+	border-bottom-style: double;
+	border-top-style: double;
+	border-bottom-width: medium;
+	border-top-width: medium;
+	border-bottom-color: #C0C0C0;
+	border-top-color: #C0C0C0;
+/* 	margin-bottom: 2px; */
+/* 	margin-top: 2px; */
+}
+
+.run-meeting-table2 th {
+	text-align: left; 
+	padding-left: 20px;
+	padding-right: 20px;
+	border-top: thin; 
+	border-top-style: solid;
+	border-top-width: thin;
+	border-top-color: #C0C0C0;}
+
+.run-meeting-table-row2 {
+	margin: 1px 0px
+}
+
+.run-meeting-table-row2>tbody>tr>th {
+	text-align: left; 
+	padding-left: 20px;}
+	
+.run-meeting-table-row2>tbody>tr {
+	line-height: 22px;
+}
+
+.run-meeting-table-row2>tbody>tr td { 
+	padding: 20px;
+	border-right-style: solid;
+	border-right-width: thin;
+	border-right-color: #C0C0C0;
+	vertical-align: middle;
+}
+
+.run-meeting-table-row2>tbody>tr:hover td {
+	background-color: #EDFFF1;
+}
+
+.run-meeting-table-row2 textarea {
+	height:20px; width:862px;
+}
+
+.shift-inline-edit {width:900px; height:20px;}

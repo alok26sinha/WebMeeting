@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+		<!--constant name="struts.objectFactory" value="org.apache.struts2.spring.StrutsSpringObjectFactory" /-->
+    	<!--constant name="struts.enable.DynamicMethodInvocation" value="false" />
+    	<constant name="struts.devMode" value="false" /-->
+    	<constant name="struts.ognl.allowStaticMethodAccess" value="true"/>
+
+	    <package name="jakarta" extends="struts-default">
+	     
+	    	<result-types>
+				<result-type name="itext"
+                         class="webapp.ItextResultType"/>  
+                 <result-type name="file"
+                         class="struts.PermanentFileResult"/>                       
+        	</result-types>
+
+	    	<interceptors>
+       			<interceptor name="log" 
+                    class="struts.LoggingInterceptor"/>
+                <interceptor name="formAuthentication"
+                	class="security.FormAuthenticationInterceptor"/>
+                <interceptor-stack name="default">
+	      			<interceptor-ref name="log"/>
+	      			<interceptor-ref name="servletConfig"/>
+	      			<interceptor-ref name="formAuthentication"/>
+	      			<!--interceptor-ref name="chain"/>-->
+	      			<interceptor-ref name="fileUpload"/>
+                	<interceptor-ref name="checkbox"/>
+                	<interceptor-ref name="params"/>
+    			</interceptor-stack>
+                <interceptor-stack name="calendar">
+	      			<interceptor-ref name="log"/>
+	      			<interceptor-ref name="servletConfig"/>
+	      			<!--interceptor-ref name="chain"/>-->
+                	<interceptor-ref name="params"/>
+    			</interceptor-stack>
+     		</interceptors>
+			
+    		<default-interceptor-ref name="default"/>
+    		
+    		<!--  -->
+    		
+		   	<global-results>
+			     <result name="error">/WEB-INF/view/support/Error.jsp</result>
+			     <result name="insufficientPrivileges">/WEB-INF/view/support/InsufficientPrivileges.jsp</result>
+			     <result name="file" type="file"></result>
+   			</global-results>
+   			
+	    </package>
+	    
+	    <package name="support" namespace="/support" extends="jakarta">
+	    	<action name="*" class="controller.support.{1}Action">
+	            <result name="list">/WEB-INF/view/support/{1}List.jsp</result>
+	            <result name="edit">/WEB-INF/view/support/{1}Edit.jsp</result>
+	            <result name="view">/WEB-INF/view/support/{1}View.jsp</result>
+	            <result name="success">/WEB-INF/view/support/{1}.jsp</result>
+	            <result name="itext" type="itext">{1}</result>
+	        </action>
+	    </package>
+
+	    <package name="shift" namespace="/shiftmeeting" extends="jakarta">
+	    	<action name="*" class="controller.shiftmeeting.{1}Action">
+	            <result name="list">/WEB-INF/view/shiftmeeting/{1}List.jsp</result>
+	            <result name="edit">/WEB-INF/view/shiftmeeting/{1}Edit.jsp</result>
+	            <result name="view">/WEB-INF/view/shiftmeeting/{1}View.jsp</result>
+	            <result name="success">/WEB-INF/view/shiftmeeting/{1}.jsp</result>
+	            <result name="itext" type="itext">{1}</result>         
+	        </action>
+	    </package>
+
+	    <package name="dart" namespace="/dartmeeting" extends="jakarta">
+	    	<action name="*" class="controller.dartmeeting.{1}Action">
+	            <result name="list">/WEB-INF/view/dartmeeting/{1}List.jsp</result>
+	            <result name="edit">/WEB-INF/view/dartmeeting/{1}Edit.jsp</result>
+	            <result name="view">/WEB-INF/view/dartmeeting/{1}View.jsp</result>
+	            <result name="success">/WEB-INF/view/dartmeeting/{1}.jsp</result>
+	            <result name="itext" type="itext">{1}</result>   
+	        </action>
+	    </package>
+
+	    <package name="dartmanage" namespace="/dartmanage" extends="jakarta">
+	    	<action name="*" class="controller.dartmanage.{1}Action">
+	            <result name="list">/WEB-INF/view/dartmanage/{1}List.jsp</result>
+	            <result name="edit">/WEB-INF/view/dartmanage/{1}Edit.jsp</result>
+	            <result name="view">/WEB-INF/view/dartmamange/{1}View.jsp</result>
+	            <result name="success">/WEB-INF/view/dartmanage/{1}.jsp</result>
+	            <result name="itext" type="itext">{1}</result>    
+	        </action>
+	    </package>
+
+
+	    <package name="dartrun" namespace="/dartrun" extends="jakarta">
+	    	<action name="*" class="controller.dartrun.{1}Action">
+	            <result name="list">/WEB-INF/view/dartrun/{1}List.jsp</result>
+	            <result name="edit">/WEB-INF/view/dartrun/{1}Edit.jsp</result>
+	            <result name="view">/WEB-INF/view/dartrun/{1}View.jsp</result>
+	            <result name="success">/WEB-INF/view/dartrun/{1}.jsp</result>
+	            <result name="itext" type="itext">{1}</result>    
+	        </action>
+	    </package>
+
+</struts>

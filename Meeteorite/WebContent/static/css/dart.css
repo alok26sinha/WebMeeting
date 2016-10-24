@@ -1,0 +1,34 @@
+body {
+    /*background: transparent url(../img/background/bg_dart_main.png) repeat-x;*/
+}
+.navbar {
+    background: url("../img/background/bg_dart_main.png") repeat-x scroll 0 0 transparent;
+}
+
+.navbar-main .navbar-logo {padding: 8px 0; }
+.navbar-bottom .nav-tabs {margin-top: inherit; }
+
+.navbar {border-color: #86c451}
+
+.navbar-shift-login .nav-tabs > li.active > a, .navbar-shift-login > .nav-tabs > li.active > .btn-group > a.btn.btn-primary { background-color: #03990F; border-color: #29681D}
+
+.navbar-inner {
+    background: transparent url(../img/background/bg_dart_main.png) repeat-x;
+}
+
+.attachments .drop-down ul li a {color: #037f0c;}
+
+
+
+.navbar-bottom .nav-tabs>li.active>a,navbar-main>.nav-tabs>li.active>a:hover,
+.navbar-bottom .navbar .nav .active>a,.navbar .nav .active>a:hover,
+a,
+h1,
+h2,
+h3,
+.page-content>.container>.tabbable>.nav-tabs>.active>a,.nav-tabs>.active>a:hover,
+.page-content>.container>.tabbable>.nav-tabs>li>a:hover,
+.page-content>.container>.tabbable>.nav-tabs>li.active>a:hover {
+    color: #037f0c;
+}
+
